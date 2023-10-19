@@ -5,12 +5,12 @@ import abi from './abi';
 
 const provider = new ethers.providers.JsonRpcProvider('https://rpc.goerli.linea.build');
 // 空投合约地址
-const AIRDROP_OUTER_LINEA_ADDR = '0x975427167FB9ec0Ed468F0EBda16F3C194eEF699';
+const AIRDROP_OUTER_LINEA_ADDR = '0x50617aD592A497b04d10372EDDf3288a868D55b7';
 
 // 空投钱包私钥
 const privateKey = "";
 // 每个地址空投eth数量
-const amount = '0.8';
+const amount = '0.01';
 
 const airdropEth = async (addresses: string[]) => {
   while (true) {
