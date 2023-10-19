@@ -31,7 +31,7 @@ export default [
         "type": "uint256[]"
       }
     ],
-    "name": "multiTransferLocal",
+    "name": "multiTransferETH",
     "outputs": [],
     "stateMutability": "payable",
     "type": "function"

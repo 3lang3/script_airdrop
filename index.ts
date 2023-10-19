@@ -3,20 +3,20 @@ import { readFileSync } from "fs";
 import path from "path";
 import abi from './abi';
 
-const provider = new ethers.providers.JsonRpcProvider('https://rpc.goerli.linea.build');
+const provider = new ethers.providers.JsonRpcProvider('https://rpc.ankr.com/eth_goerli');
 // 空投合约地址
-const AIRDROP_OUTER_LINEA_ADDR = '0x50617aD592A497b04d10372EDDf3288a868D55b7';
+const AIRDROP_ADDR = '0x50617aD592A497b04d10372EDDf3288a868D55b7';
 
 // 空投钱包私钥
 const privateKey = "";
 // 每个地址空投eth数量
-const amount = '0.01';
+const amount = '0.01' // eth;
 
 const airdropEth = async (addresses: string[]) => {
   while (true) {
     try {
       const signer = new ethers.Wallet(privateKey, provider);
-      const contract = new ethers.Contract(AIRDROP_OUTER_LINEA_ADDR, abi, signer);
+      const contract = new ethers.Contract(AIRDROP_ADDR, abi, signer);
       const amounts = addresses.map(() => ethers.utils.parseEther(amount));
       const amountTotal = amounts.reduce((a, b) => a.add(b), ethers.BigNumber.from(0));
 
@@ -30,13 +30,13 @@ const airdropEth = async (addresses: string[]) => {
       const feeData = await provider.getFeeData();
       const maxFeePerGas = feeData.gasPrice.add(ethers.utils.parseUnits('10', 'gwei'));
       const maxPriorityFeePerGas = maxFeePerGas.sub(ethers.utils.parseUnits('1', 'wei'))
-      const gasLimit = await contract.estimateGas.multiTransferLocal(
+      const gasLimit = await contract.estimateGas.multiTransferETH(
         addresses,
         amounts,
         { value: amountTotal }
       )
       const nonce = await signer.getTransactionCount();
-      const tx: ethers.ContractTransaction = await contract.multiTransferLocal(
+      const tx: ethers.ContractTransaction = await contract.multiTransferETH(
         addresses,
         amounts,
         {
@@ -63,7 +63,11 @@ function getTxtContent(path: string) {
 }
 
 const main = async () => {
+  if (!privateKey) throw  Error('请填写私钥')
+  if (!amount) throw  Error('请填写单号空投金额')
   const addresses = getTxtContent(path.join(__dirname, './addresses.txt'));
+  if (!addresses?.length) throw Error("未发现需要空投的地址")
+  console.log(`🤖 共${addresses.length}个地址, 每个地址空投${amount}eth`)
   while (addresses.length) {
     // 一次空投最多200个地址，分组空投
     const arr = addresses.splice(0, 200);
